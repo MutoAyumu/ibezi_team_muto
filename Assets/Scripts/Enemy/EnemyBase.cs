@@ -1,0 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyBase : MonoBehaviour
+{
+    bool _hitFlg = false;
+
+    public bool HitFlg => _hitFlg;
+    public void CutCoffeeBean()
+    {
+        Debug.Log("Cut");
+        _hitFlg = true;
+    }
+}

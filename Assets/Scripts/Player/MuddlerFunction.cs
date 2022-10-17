@@ -7,6 +7,8 @@ using UnityEngine;
 public class MuddlerFunction : MonoBehaviour
 {
     [SerializeField] float _maxLength;
+    [SerializeField] float _intervalChangeLength = 1f;
+    [SerializeField] float _intervalRotation = 1f;
     [SerializeField] Transform _cullentSize = null;
     [SerializeField] Transform _center = null;
     [SerializeField] LayerMask _enemyLayer = ~0;
@@ -16,13 +18,13 @@ public class MuddlerFunction : MonoBehaviour
 
     private void Start()
     {
-        MuddlerLengthMax(_maxLength, 2f);
+        MuddlerLengthMax(_maxLength, _intervalChangeLength);
     }
     private void Update()
     {
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            MuddlerRotation(1f);
+            MuddlerRotation(_intervalRotation);
             _sequence.Pause();
         }
     }
@@ -50,6 +52,7 @@ public class MuddlerFunction : MonoBehaviour
         _sequence2 = DOTween.Sequence();
         var tweener = _center.DORotate(new Vector3(0f, 0f, -360f), interval, RotateMode.FastBeyond360)
             .SetEase(Ease.Linear)
+            .OnUpdate(() => HitAction())
             .OnComplete(() => _sequence.Play());
         _sequence2.Append(tweener);
     }
@@ -58,16 +61,26 @@ public class MuddlerFunction : MonoBehaviour
     /// </summary>
     void HitAction()
     {
-        Collider[] enemiesInRenge = Physics.OverlapBox(_center.position, this.transform.localScale, Quaternion.identity, _enemyLayer);
+        Vector2 size = new Vector2(_cullentSize.localScale.x, _cullentSize.localScale.y);
+        Collider2D[] enemiesInRenge = Physics2D.OverlapBoxAll(_cullentSize.position, size, 1f, _enemyLayer);
         if (enemiesInRenge.Length > 0)
         {
-            foreach (Collider enemy in enemiesInRenge)
+            foreach (Collider2D enemy in enemiesInRenge)
             {
-                //if (enemy.TryGetComponent<EnemyStatus>(out EnemyStatus enemyHp))
-                //{
-                //    enemyHp.DamageMethod(_rigitPower, _firePower, _elekePower, _frozenPower);
-                //}
+                if (enemy.TryGetComponent<EnemyBase>(out EnemyBase e))
+                {
+                    if (!e.HitFlg)
+                    {
+                        e.CutCoffeeBean();
+                    }
+                }
             }
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(_cullentSize.position, _cullentSize.localScale);
     }
 }
