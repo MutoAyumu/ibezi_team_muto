@@ -7,7 +7,7 @@ public class EnemyBase : MonoBehaviour
     bool _hitFlg = false;
 
     public bool HitFlg => _hitFlg;
-    public void CutCoffeeBean()
+    public void Damage()
     {
         Debug.Log("Cut");
         _hitFlg = true;
