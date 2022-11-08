@@ -15,6 +15,7 @@ public class MuddlerFunction : MonoBehaviour
     [SerializeField] float _rotationInterval = 1f;
     [SerializeField] Transform _center = null;
     [SerializeField] Ease _rotationEase = Ease.Linear;
+    [SerializeField] VaryingTimeScaler _timeScaler;
 
     [Header("HitAction")]
     [SerializeField] LayerMask _enemyLayer = ~0;
@@ -56,6 +57,8 @@ public class MuddlerFunction : MonoBehaviour
     /// <param name="interval"></param>ˆê‰ñ“]‚ÉŠ|‚©‚éŽžŠÔ
     public void Rotation(float interval)
     {
+        _timeScaler?.SlowDown();
+
         _rotateSequence = DOTween.Sequence();
         var tweener = _center.DORotate(new Vector3(0f, 0f, -360f), interval, RotateMode.FastBeyond360)
             .SetEase(_rotationEase)
